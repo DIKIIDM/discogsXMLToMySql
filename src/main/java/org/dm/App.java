@@ -4,6 +4,9 @@ import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.sql.Connection;
+
 public class App {
     private static final Logger logger = LogManager.getLogger(App.class);
     //------------------------------------------------------------------
@@ -35,20 +38,30 @@ public class App {
             options.addOption(oDatabaseURL);
 
             CommandLine cmd = new DefaultParser().parse(options, args);
-
-            String pathToXMLFolder = cmd.getOptionValue("pathToXMLFolder");
-            String databaseUsername = cmd.getOptionValue("databaseUsername");
-            String databaseUserPassword = cmd.getOptionValue("databaseUserPassword");
-            String databaseURL = cmd.getOptionValue("databaseURL");
-
-            logger.info(pathToXMLFolder);
-            logger.info(databaseUsername);
-            logger.info(databaseUserPassword);
-            logger.info(databaseURL);
+            xmlToMysql(cmd.getOptionValue("pathToXMLFolder")
+                      ,cmd.getOptionValue("databaseUsername")
+                      ,cmd.getOptionValue("databaseUserPassword")
+                      ,cmd.getOptionValue("databaseURL")
+            );
         } catch (ParseException e) {
             logger.error(e.getMessage());
             new HelpFormatter().printHelp("discogsXMlToMySql", options);
             throw new RuntimeException("Wrong arguments");
+        } catch (RuntimeException e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException(e);
         }
+    }
+    //------------------------------------------------------------------
+    private static void xmlToMysql(String pathToXMLFolder
+                                 ,String databaseUsername
+                                 ,String databaseUserPassword
+                                 ,String databaseURL)
+    {
+        File xmlFolder = new File(pathToXMLFolder);
+        if (!xmlFolder.isDirectory())
+            throw new RuntimeException("Wrong path to the folder");
+
+        Connection con = DBManage.getDBConnect(databaseUsername, databaseUserPassword, databaseURL);
     }
 }
