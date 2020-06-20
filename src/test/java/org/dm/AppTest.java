@@ -2,7 +2,6 @@ package org.dm;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.cli.ParseException;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +41,7 @@ public class AppTest{
                  "-f","C:/dm/work/dz/discogs"
                 ,"-u", "root"
                 ,"-p", "root!!"
-                ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+                ,"-url", "jdbc:mysql://localhost/discogs2?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
         );
     }
     //------------------------------------------------------------------
@@ -54,20 +53,18 @@ public class AppTest{
                  "-f","C:/dm/work/dz/discogs/empty"
                 ,"-u", "root"
                 ,"-p", "root"
-                ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+                ,"-url", "jdbc:mysql://localhost/discogs2?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
         );
     }
     //------------------------------------------------------------------
     @Ignore
     @Test
-    public void xmlFileArtistNotFound() throws Exception {
-        expectedEx.expect(RuntimeException.class);
-        expectedEx.expectMessage("XML files not found");
+    public void regular() throws Exception {
         App.xmlToMysql(new String[]{
-                "-f","C:/dm/work/dz/discogs"
+                 "-f","C:/dm/work/dz/discogs"
                 ,"-u", "root"
                 ,"-p", "root"
-                ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+                ,"-url", "jdbc:mysql://localhost/discogs2?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
         );
     }
 }

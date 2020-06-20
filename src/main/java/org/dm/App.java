@@ -6,8 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class App {
     private static final Logger logger = LogManager.getLogger(App.class);
@@ -77,17 +77,29 @@ public class App {
         if ((fileArtist == null) && (fileRelease == null))
             throw new RuntimeException("XML files not found");
 
-        Connection con = DBManage.getDBConnect(databaseUsername, databaseUserPassword, databaseURL);
-
+        Connection con;
+        try {
+            con = DBManage.getDBConnect(databaseUsername, databaseUserPassword, databaseURL);
+            con.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         if (fileArtist == null)
             logger.warn("Artist XML file not found");
         else {
-
+            ParserArtist parserArtist = new ParserArtist();
+            parserArtist.parser(con, fileArtist);
         }
         if (fileRelease == null)
             logger.warn("Release XML file not found");
         else {
 
+        }
+
+        try {
+            con.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

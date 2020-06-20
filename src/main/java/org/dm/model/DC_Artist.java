@@ -2,6 +2,7 @@ package org.dm.model;
 
 import org.dm.Core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DC_Artist {
@@ -10,19 +11,20 @@ public class DC_Artist {
     public String sName;
     public String sRealName;
     public String sNameShort;
-    public List<String> lNameVariation;
     public List<DC_ArtistAlias> lAlias;
+    public List<DC_ArtistVariation> lVariation;
     //----------------------------------------------------------------------------------
     public DC_Artist() {
-
+        lAlias = new ArrayList<>();
+        lVariation = new ArrayList<>();
     }
     //----------------------------------------------------------------------------------
     public void setsName(String sName) {
-        this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");;
+        this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");
     }
     //----------------------------------------------------------------------------------
     public void setsRealName(String sRealName) {
-        this.sRealName = sRealName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");;
+        this.sRealName = sRealName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");
     }
     //----------------------------------------------------------------------------------
     @Override
