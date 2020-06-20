@@ -1,0 +1,37 @@
+package org.dm.model;
+
+import org.dm.Core;
+
+import java.util.List;
+
+public class DC_Artist {
+    public Integer id;
+    public Integer idDC;
+    public String sName;
+    public String sRealName;
+    public String sNameShort;
+    public List<String> lNameVariation;
+    public List<DC_ArtistAlias> lAlias;
+    //----------------------------------------------------------------------------------
+    public DC_Artist() {
+
+    }
+    //----------------------------------------------------------------------------------
+    public void setsName(String sName) {
+        this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");;
+    }
+    //----------------------------------------------------------------------------------
+    public void setsRealName(String sRealName) {
+        this.sRealName = sRealName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");;
+    }
+    //----------------------------------------------------------------------------------
+    @Override
+    public String toString() {
+        return "id=" + this.id + "; name=" + Core.nvl(this.sName, "") + "; real name=" + Core.nvl(this.sRealName, "");
+    }
+    //----------------------------------------------------------------------------------
+    public void init() {
+        if (sName != null)
+            this.sNameShort = sName.substring(0, Math.min(sName.length(), 254));
+    }
+}
