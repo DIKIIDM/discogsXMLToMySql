@@ -39,9 +39,34 @@ public class AppTest{
         expectedEx.expect(RuntimeException.class);
         expectedEx.expectMessage("Connection to database error");
         App.xmlToMysql(new String[]{
-                 "-f","C:/logs"
+                 "-f","C:/dm/work/dz/discogs"
                 ,"-u", "root"
                 ,"-p", "root!!"
+                ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+        );
+    }
+    //------------------------------------------------------------------
+    @Test
+    public void xmlFilesNotFound() throws Exception {
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("XML files not found");
+        App.xmlToMysql(new String[]{
+                 "-f","C:/dm/work/dz/discogs/empty"
+                ,"-u", "root"
+                ,"-p", "root"
+                ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+        );
+    }
+    //------------------------------------------------------------------
+    @Ignore
+    @Test
+    public void xmlFileArtistNotFound() throws Exception {
+        expectedEx.expect(RuntimeException.class);
+        expectedEx.expectMessage("XML files not found");
+        App.xmlToMysql(new String[]{
+                "-f","C:/dm/work/dz/discogs"
+                ,"-u", "root"
+                ,"-p", "root"
                 ,"-url", "jdbc:mysql://localhost/discogs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
         );
     }

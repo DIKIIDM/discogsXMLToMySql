@@ -1,10 +1,12 @@
 package org.dm;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.sql.Connection;
 
 public class App {
@@ -54,14 +56,38 @@ public class App {
     }
     //------------------------------------------------------------------
     private static void xmlToMysql(String pathToXMLFolder
-                                 ,String databaseUsername
-                                 ,String databaseUserPassword
-                                 ,String databaseURL)
+                                  ,String databaseUsername
+                                  ,String databaseUserPassword
+                                  ,String databaseURL)
     {
         File xmlFolder = new File(pathToXMLFolder);
         if (!xmlFolder.isDirectory())
             throw new RuntimeException("Wrong path to the folder");
 
+        File fileArtist = null;
+        File fileRelease = null;
+        for (final File file : xmlFolder.listFiles()) {
+            if (FilenameUtils.getExtension(file.getName()).equals("xml")) {
+                if (file.getName().toLowerCase().contains("artists"))
+                    fileArtist = file;
+                if (file.getName().toLowerCase().contains("releases"))
+                    fileRelease = file;
+            }
+        }
+        if ((fileArtist == null) && (fileRelease == null))
+            throw new RuntimeException("XML files not found");
+
         Connection con = DBManage.getDBConnect(databaseUsername, databaseUserPassword, databaseURL);
+
+        if (fileArtist == null)
+            logger.warn("Artist XML file not found");
+        else {
+
+        }
+        if (fileRelease == null)
+            logger.warn("Release XML file not found");
+        else {
+
+        }
     }
 }
