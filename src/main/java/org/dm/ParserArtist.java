@@ -19,7 +19,6 @@ import java.util.List;
 
 public class ParserArtist {
     private static final Logger logger = LogManager.getLogger(ParserArtist.class);
-    public Connection connection;
     //----------------------------------------------------------------------------------
     public ParserArtist() {
     }
@@ -58,9 +57,9 @@ public class ParserArtist {
         DC_ArtistAlias artistAlias;
         DC_ArtistVariation artistVariation;
 
-        DZ_Seq seqArtist = new DZ_Seq();
-        DZ_Seq seqArtistVariation = new DZ_Seq();
-        DZ_Seq seqArtistAlias = new DZ_Seq();
+        Seq seqArtist = new Seq();
+        Seq seqArtistVariation = new Seq();
+        Seq seqArtistAlias = new Seq();
 
         int num = 0;
         boolean bId = false;

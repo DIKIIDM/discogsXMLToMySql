@@ -93,9 +93,9 @@ public class App {
         if (fileRelease == null)
             logger.warn("Release XML file not found");
         else {
-
+            ParserRelease parserRelease = new ParserRelease();
+            parserRelease.parser(con, fileRelease);
         }
-
         try {
             con.close();
         } catch (SQLException e) {
