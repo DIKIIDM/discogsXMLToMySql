@@ -20,7 +20,7 @@ public class JDBC_Release {
             "      ,sCountry                            " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?);                     ";
+            "   (?, ?, ?, ?, ?, ?)                      ";
     private static String SQL_INSERT_Genre = "          " +
             "INSERT INTO dc_releaseGenre                " +
             "   (   id                                  " +
@@ -29,7 +29,7 @@ public class JDBC_Release {
             "      ,sName                               " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?);                           ";
+            "   (?, ?, ?, ?)                            ";
     private static String SQL_INSERT_Style = "          " +
             "INSERT INTO dc_releaseStyle                " +
             "   (   id                                  " +
@@ -38,7 +38,7 @@ public class JDBC_Release {
             "      ,sName                               " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?);                           ";
+            "   (?, ?, ?, ?)                            ";
     private static String SQL_INSERT_ReleaseArtist = "  " +
             "INSERT INTO dc_releaseArtist               " +
             "   (   id                                  " +
@@ -53,7 +53,7 @@ public class JDBC_Release {
             "      ,sTracks                             " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);         ";
+            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)          ";
     private static String SQL_INSERT_ReleaseExtraArtist = "  " +
             "INSERT INTO dc_releaseExtraArtist          " +
             "   (   id                                  " +
@@ -68,7 +68,7 @@ public class JDBC_Release {
             "      ,sTracks                             " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);         ";
+            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)          ";
     private static String SQL_INSERT_ReleaseTrack = "   " +
             "INSERT INTO dc_releaseTrack                " +
             "   (   id                                  " +
@@ -80,7 +80,18 @@ public class JDBC_Release {
             "      ,sDuration                           " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?, ?);                  ";
+            "   (?, ?, ?, ?, ?, ?, ?)                   ";
+    private static String SQL_INSERT_ReleaseLabel = "   " +
+            "INSERT INTO dc_releaseLabel                " +
+            "   (   id                                  " +
+            "      ,idRelease                           " +
+            "      ,idReleaseDC                         " +
+            "      ,idLabel                             " +
+            "      ,idLabelDC                           " +
+            "      ,sCatno                              " +
+            "   )                                       " +
+            " VALUES                                    " +
+            "   (?, ?, ?, ?, ?, ?)                      ";
     //----------------------------------------------------------------------------------
     public JDBC_Response insert(List<DC_Release> lRelease, Connection con) {
         JDBC_Response response = new JDBC_Response();
@@ -226,6 +237,30 @@ public class JDBC_Release {
                     if (Core.isNull(releaseTrack.sType)) ps.setNull(5, Types.VARCHAR); else ps.setString(5, releaseTrack.sType);
                     if (Core.isNull(releaseTrack.sPosition)) ps.setNull(6, Types.VARCHAR); else ps.setString(6, releaseTrack.sPosition);
                     if (Core.isNull(releaseTrack.sDuration)) ps.setNull(7, Types.VARCHAR); else ps.setString(7, releaseTrack.sDuration);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+            response.bSuccess = true;
+        } catch (Exception e) {
+            response.bSuccess = false;
+            response.sMessage = e.getMessage();
+        }
+        return response;
+    }
+    //----------------------------------------------------------------------------------
+    public JDBC_Response insertReleaseLabel(List<DC_ReleaseLabel> lReleaseLabel, Connection con) {
+        JDBC_Response response = new JDBC_Response();
+        try {
+            if (lReleaseLabel.size() > 0) {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT_ReleaseLabel, Statement.RETURN_GENERATED_KEYS);
+                for (DC_ReleaseLabel object : lReleaseLabel) {
+                    if (object.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, object.id);
+                    if (object.idRelease == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, object.idRelease);
+                    if (object.idReleaseDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, object.idReleaseDC);
+                    if (object.idLabel == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, object.idLabel);
+                    if (object.idLabelDC == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, object.idReleaseDC);
+                    if (Core.isNull(object.sCatno)) ps.setNull(6, Types.VARCHAR); else ps.setString(6, object.sCatno);
                     ps.addBatch();
                 }
                 ps.executeBatch();

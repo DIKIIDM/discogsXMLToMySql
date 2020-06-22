@@ -9,7 +9,7 @@ public class DBManage {
     public static Connection getDBConnect(String dbLogin, String dbPassword, String dbURL) {
         Connection con;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Sql driver not found");
         }

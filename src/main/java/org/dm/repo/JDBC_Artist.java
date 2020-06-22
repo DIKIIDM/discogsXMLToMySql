@@ -22,7 +22,7 @@ public class JDBC_Artist {
             "      ,sNameShort                          " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?);                        ";
+            "   (?, ?, ?, ?, ?)                         ";
     private static String SQL_INSERT_NAME_VARIATION = " " +
             "INSERT INTO dc_artistVariation             " +
             "   (   id                                  " +
@@ -32,7 +32,7 @@ public class JDBC_Artist {
             "      ,sNameShort                          " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?);                        ";
+            "   (?, ?, ?, ?, ?)                         ";
     private static String SQL_INSERT_ALIAS = "          " +
             "INSERT INTO dc_artistAlias                 " +
             "   (   id                                  " +
@@ -42,19 +42,19 @@ public class JDBC_Artist {
             "      ,sName                               " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?);                        ";
+            "   (?, ?, ?, ?, ?)                         ";
     //----------------------------------------------------------------------------------
     public JDBC_Response insert(List<DC_Artist> lArtist, Connection con) {
         JDBC_Response response = new JDBC_Response();
         try {
             if (lArtist.size() > 0) {
-                PreparedStatement ps = con.prepareStatement(SQL_INSERT_ONE, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT_ONE);
                 for (DC_Artist artist: lArtist) {
                     if (artist.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, artist.id);
                     if (artist.idDC == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, artist.idDC);
-                    if (Core.isNull(artist.sName)) ps.setNull(3, 1); else ps.setString(3, artist.sName);
-                    if (Core.isNull(artist.sRealName)) ps.setNull(4, 1); else ps.setString(4, artist.sRealName);
-                    if (Core.isNull(artist.sNameShort)) ps.setNull(5, 1); else ps.setString(5, artist.sNameShort);
+                    if (Core.isNull(artist.sName)) ps.setNull(3, Types.VARCHAR); else ps.setString(3, artist.sName);
+                    if (Core.isNull(artist.sRealName)) ps.setNull(4, Types.VARCHAR); else ps.setString(4, artist.sRealName);
+                    if (Core.isNull(artist.sNameShort)) ps.setNull(5, Types.VARCHAR); else ps.setString(5, artist.sNameShort);
                     ps.addBatch();
                 }
                 ps.executeBatch();
