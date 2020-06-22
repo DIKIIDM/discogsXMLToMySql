@@ -63,7 +63,7 @@ public class AppTest{
                  "-f","C:/dm/work/dz/discogs"
                 ,"-u", "root"
                 ,"-p", "root"
-                ,"-url", "jdbc:mysql://localhost/discogs2?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC"}
+                ,"-url", "jdbc:mysql://localhost/discogs2?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&rewriteBatchedStatements=true"}
         );
     }
 }

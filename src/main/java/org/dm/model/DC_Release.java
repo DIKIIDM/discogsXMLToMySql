@@ -19,6 +19,7 @@ public class DC_Release extends DC_Entity {
     public List<DC_ReleaseStyle> lStyle;
     public List<DC_ReleaseGenre> lGenre;
     public List<DC_ReleaseTrack> lTrack;
+    public List<DC_ReleaseLabel> lLabel;
     //----------------------------------------------------------------------------------
     public DC_Release() {
         lArtist = new ArrayList<>();
@@ -26,6 +27,7 @@ public class DC_Release extends DC_Entity {
         lStyle = new ArrayList<>();
         lGenre = new ArrayList<>();
         lTrack = new ArrayList<>();
+        lLabel = new ArrayList<>();
     }
     //----------------------------------------------------------------------------------
     public void setsTitle(String sValue) {

@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class App {
     private static final Logger logger = LogManager.getLogger(App.class);
@@ -60,18 +62,24 @@ public class App {
                                   ,String databaseUserPassword
                                   ,String databaseURL)
     {
+        Map<Integer, Integer> idsLabel = new HashMap<>();
+        Map<Integer, Integer> idsArtist = new HashMap<>();
+
         File xmlFolder = new File(pathToXMLFolder);
         if (!xmlFolder.isDirectory())
             throw new RuntimeException("Wrong path to the folder");
 
         File fileArtist = null;
         File fileRelease = null;
+        File fileLabel = null;
         for (final File file : xmlFolder.listFiles()) {
             if (FilenameUtils.getExtension(file.getName()).equals("xml")) {
                 if (file.getName().toLowerCase().contains("artists"))
                     fileArtist = file;
                 if (file.getName().toLowerCase().contains("releases"))
                     fileRelease = file;
+                if (file.getName().toLowerCase().contains("labels"))
+                    fileLabel = file;
             }
         }
         if ((fileArtist == null) && (fileRelease == null))
@@ -87,14 +95,24 @@ public class App {
         if (fileArtist == null)
             logger.warn("Artist XML file not found");
         else {
-            ParserArtist parserArtist = new ParserArtist();
-            parserArtist.parser(con, fileArtist);
+            ParserArtist parserArtist = new ParserArtist(con);
+            parserArtist.parse(fileArtist);
+            idsArtist = parserArtist.getIds();
+        }
+        if (fileLabel == null)
+            logger.warn("Label XML file not found");
+        else {
+            ParserLabel parserLabel = new ParserLabel(con);
+            parserLabel.parse(fileLabel);
+            idsLabel = parserLabel.getIds();
         }
         if (fileRelease == null)
             logger.warn("Release XML file not found");
         else {
-            ParserRelease parserRelease = new ParserRelease();
-            parserRelease.parser(con, fileRelease);
+            ParserRelease parserRelease = new ParserRelease(con);
+            parserRelease.setIdsLabel(idsLabel);
+            parserRelease.setIdsArtist(idsArtist);
+            parserRelease.parse(fileRelease);
         }
         try {
             con.close();

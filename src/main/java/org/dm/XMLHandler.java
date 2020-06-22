@@ -45,7 +45,6 @@ public class XMLHandler extends DefaultHandler {
         try {
             insert();
             connection.commit();
-            clearLists();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }

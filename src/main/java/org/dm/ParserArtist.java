@@ -6,21 +6,32 @@ import org.dm.model.*;
 import org.dm.repo.JDBC_Artist;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParserArtist extends Parser {
     private static final Logger logger = LogManager.getLogger(ParserArtist.class);
     //----------------------------------------------------------------------------------
     public ParserArtist() {
+        handler = regHandler();
+    }
+    //----------------------------------------------------------------------------------
+    public ParserArtist(Connection connection) {
+        handler = regHandler();
+        handler.connection = connection;
     }
     //----------------------------------------------------------------------------------
     @Override
-    public XMLHandler getHandler() {
+    public XMLHandler regHandler() {
         return new XMLHandlerArtist();
     }
     //----------------------------------------------------------------------------------
     public static class XMLHandlerArtist extends XMLHandler {
+        public Map<Integer, Integer> idsArtist = new HashMap<>();
         DC_Artist artist;
         DC_ArtistAlias artistAlias;
         DC_ArtistVariation artistVariation;
@@ -131,7 +142,7 @@ public class ParserArtist extends Parser {
                 bGroups = false;
             } else if (qName.equalsIgnoreCase("Artist")) {
                 lArtist.add(artist);
-                artist.init();
+                idsArtist.put(artist.idDC, artist.id);
                 num++;
                 if (bId
                         || bName
@@ -144,10 +155,11 @@ public class ParserArtist extends Parser {
                         || bNameMember
                         || bGroups
                         || bNameGroup)
-                    throw new RuntimeException("artist parser error " + artist.idDC);
+                    throw new RuntimeException("artist parse error " + artist.idDC);
 
                 if ((num % 100000 == 0) & !bTest) {
                     writeToDB();
+                    clearLists();
                     logger.info(num + " artists done");
                 }
             }
@@ -179,5 +191,9 @@ public class ParserArtist extends Parser {
         public List<? extends DC_Entity> getResult() {
             return lArtist;
         }
+    }
+    //----------------------------------------------------------------------------------
+    public Map<Integer, Integer> getIds() {
+        return ((XMLHandlerArtist)getHandler()).idsArtist;
     }
 }

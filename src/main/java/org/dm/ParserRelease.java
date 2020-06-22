@@ -6,18 +6,40 @@ import org.dm.model.*;
 import org.dm.repo.JDBC_Release;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ParserRelease extends Parser {
     private static final Logger logger = LogManager.getLogger(ParserRelease.class);
     //----------------------------------------------------------------------------------
+    public ParserRelease() {
+        handler = regHandler();
+    }
+    //----------------------------------------------------------------------------------
+    public ParserRelease(Connection connection) {
+        handler = regHandler();
+        handler.connection = connection;
+    }
+    //----------------------------------------------------------------------------------
     @Override
-    public org.dm.XMLHandler getHandler() {
+    public org.dm.XMLHandler regHandler() {
         return new XMLHandlerRelease();
     }
     //----------------------------------------------------------------------------------
+    public void setIdsLabel(Map<Integer, Integer> ids) {
+        ((XMLHandlerRelease)handler).setIdsLabel(ids);
+    }
+    //----------------------------------------------------------------------------------
+    public void setIdsArtist(Map<Integer, Integer> ids) {
+        ((XMLHandlerRelease)handler).setIdsArtist(ids);
+    }
+    //----------------------------------------------------------------------------------
     private static class XMLHandlerRelease extends XMLHandler {
+        Map<Integer, Integer> idsLabel;
+        Map<Integer, Integer> idsArtist;
         DC_Release release;
         DC_ReleaseArtist releaseArtist;
         DC_ReleaseArtist releaseExtraArtist;
@@ -26,6 +48,7 @@ public class ParserRelease extends Parser {
         DC_ReleaseStyle releaseStyle;
         DC_ReleaseGenre releaseGenre;
         DC_ReleaseTrack releaseTrack;
+        DC_ReleaseLabel releaseLabel;
         
         Seq seqRelease = new Seq();
         Seq seqArtist = new Seq();
@@ -33,6 +56,7 @@ public class ParserRelease extends Parser {
         Seq seqStyle = new Seq();
         Seq seqGenre = new Seq();
         Seq seqTrack = new Seq();
+        Seq seqLabel = new Seq();
 
         boolean bArtists = false;
         boolean bArtist = false;
@@ -88,12 +112,15 @@ public class ParserRelease extends Parser {
         List<DC_ReleaseStyle> lReleaseStyle = new ArrayList<>();
         List<DC_ReleaseGenre> lReleaseGenre = new ArrayList<>();
         List<DC_ReleaseTrack> lReleaseTrack = new ArrayList<>();
+        List<DC_ReleaseLabel> lReleaseLabel = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
         public void truncate() {
-            JDBC_Response respTruncate = jdbcRelease.truncateAll(connection);
-            if (!respTruncate.bSuccess) {
-                throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
+            if (!bTest) {
+                JDBC_Response respTruncate = jdbcRelease.truncateAll(connection);
+                if (!respTruncate.bSuccess) {
+                    throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
+                }
             }
         }
         //----------------------------------------------------------------------------------
@@ -230,7 +257,17 @@ public class ParserRelease extends Parser {
                 bLabels = true;
             } else if (qName.equalsIgnoreCase("Label") && bLabels) {
                 bLabel = true;
-                release.setsLabel(attributes.getValue("name"));
+                releaseLabel = new DC_ReleaseLabel();
+                releaseLabel.id = seqLabel.getNext();
+                releaseLabel.idRelease = release.id;
+                releaseLabel.idReleaseDC = release.idDC;
+                releaseLabel.idLabelDC =Integer.valueOf(attributes.getValue("id"));
+                if (!bTest)
+                    releaseLabel.idLabel = idsLabel.get(Integer.valueOf(attributes.getValue("id")));
+                releaseLabel.setsCatno(attributes.getValue("catno"));
+                lReleaseLabel.add(releaseLabel);
+                if (bTest)
+                    release.lLabel.add(releaseLabel);
             }
             stringBuilder = new StringBuilder();
         }
@@ -246,6 +283,7 @@ public class ParserRelease extends Parser {
             } else if (bArtist && bArtistId) {
                 bArtistId = false;
                 releaseArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
+
             } else if (bArtist && bArtistName) {
                 bArtistName = false;
                 releaseArtist.setsName(stringBuilder.toString());
@@ -409,11 +447,12 @@ public class ParserRelease extends Parser {
                         || (bLabels)
                         || (bLabel)
                         ) {
-                    throw new RuntimeException("release parser error " + release.idDC);
+                    throw new RuntimeException("release parse error " + release.idDC);
                 }
                 num++;
                 if ((num % 100000 == 0) & !bTest) {
                     writeToDB();
+                    clearLists();
                     logger.info(num + " releases done");
                 }
             }
@@ -445,6 +484,10 @@ public class ParserRelease extends Parser {
             if (!respInsertTrack.bSuccess) {
                 throw new RuntimeException("ReleaseTrack msg:" + respInsertTrack.sMessage);
             }
+            JDBC_Response respInsertLabel = jdbcRelease.insertReleaseLabel(lReleaseLabel, connection);
+            if (!respInsertLabel.bSuccess) {
+                throw new RuntimeException("ReleaseLabel msg:" + respInsertLabel.sMessage);
+            }
         }
         //----------------------------------------------------------------------------------
         @Override
@@ -455,11 +498,20 @@ public class ParserRelease extends Parser {
             lReleaseStyle = new ArrayList<>();
             lReleaseArtist = new ArrayList<>();
             lReleaseExtraArtist = new ArrayList<>();
+            lReleaseLabel = new ArrayList<>();
         }
         //----------------------------------------------------------------------------------
         @Override
         public List<? extends DC_Entity> getResult() {
             return lRelease;
+        }
+        //----------------------------------------------------------------------------------
+        public void setIdsLabel(Map<Integer, Integer> ids) {
+            this.idsLabel = ids;
+        }
+        //----------------------------------------------------------------------------------
+        public void setIdsArtist(Map<Integer, Integer> ids) {
+            this.idsArtist = ids;
         }
     }
 }

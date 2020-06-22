@@ -19,6 +19,8 @@ public class DC_Artist extends DC_Entity {
     //----------------------------------------------------------------------------------
     public void setsName(String sName) {
         this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");
+        if (!Core.isNull(this.sName))
+            this.sNameShort = this.sName.substring(0, Math.min(this.sName.length(), 254));
     }
     //----------------------------------------------------------------------------------
     public void setsRealName(String sRealName) {
@@ -28,10 +30,5 @@ public class DC_Artist extends DC_Entity {
     @Override
     public String toString() {
         return "id=" + this.id + "; name=" + Core.nvl(this.sName, "") + "; real name=" + Core.nvl(this.sRealName, "");
-    }
-    //----------------------------------------------------------------------------------
-    public void init() {
-        if (sName != null)
-            this.sNameShort = sName.substring(0, Math.min(sName.length(), 254));
     }
 }

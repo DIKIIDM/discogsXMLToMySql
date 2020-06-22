@@ -9,25 +9,32 @@ import java.sql.Connection;
 import java.util.List;
 
 public class Parser {
+    XMLHandler handler;
     //----------------------------------------------------------------------------------
-    public void parser(Connection connection, File file) {
+    public Parser() {
+        handler = regHandler();
+    }
+    //----------------------------------------------------------------------------------
+    public Parser(Connection connection) {
+        handler = regHandler();
+        handler.connection = connection;
+    }
+    //----------------------------------------------------------------------------------
+    public void parse(File file) {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
-            XMLHandler handler = getHandler();
-            handler.connection = connection;
-            parser.parse(file, handler);
+            parser.parse(file, this.handler);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
     //----------------------------------------------------------------------------------
-    public List<? extends DC_Entity> parser(String sXML) {
+    public List<? extends DC_Entity> parse(String sXML) {
         List<? extends DC_Entity> lResult;
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
-            XMLHandler handler = getHandler();
             handler.bTest = true;
             parser.parse(new ByteArrayInputStream(sXML.getBytes()), handler);
             lResult = handler.getResult();
@@ -37,7 +44,11 @@ public class Parser {
         return lResult;
     }
     //----------------------------------------------------------------------------------
-    public XMLHandler getHandler() {
+    public XMLHandler regHandler() {
         return null;
+    }
+    //----------------------------------------------------------------------------------
+    public XMLHandler getHandler() {
+        return handler;
     }
 }
