@@ -10,7 +10,6 @@ import org.junit.rules.ExpectedException;
 public class AppTest{
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-
     //------------------------------------------------------------------
     @Test
     public void wrongArgs() throws Exception {

@@ -6,52 +6,18 @@ import org.dm.model.*;
 import org.dm.repo.JDBC_Release;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParserRelease {
+public class ParserRelease extends Parser {
     private static final Logger logger = LogManager.getLogger(ParserRelease.class);
-    Connection connection;
     //----------------------------------------------------------------------------------
-    public void parser(Connection connection, File file) {
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            ParserRelease.XMLHandler handler = new ParserRelease.XMLHandler();
-            handler.connection = connection;
-            parser.parse(file, handler);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public org.dm.XMLHandler getHandler() {
+        return new XMLHandlerRelease();
     }
     //----------------------------------------------------------------------------------
-    public List<DC_Release> parser(String sXML) {
-        List<DC_Release> lRelease;
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            ParserRelease.XMLHandler handler = new ParserRelease.XMLHandler();
-            handler.bTest = true;
-            parser.parse(new ByteArrayInputStream(sXML.getBytes()), handler);
-            lRelease = handler.lRelease;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-        return lRelease;
-    }
-    //----------------------------------------------------------------------------------
-    private static class XMLHandler extends DefaultHandler {
-        Connection connection;
-        Boolean bTest = false;
-        
+    private static class XMLHandlerRelease extends XMLHandler {
         DC_Release release;
         DC_ReleaseArtist releaseArtist;
         DC_ReleaseArtist releaseExtraArtist;
@@ -68,7 +34,6 @@ public class ParserRelease {
         Seq seqGenre = new Seq();
         Seq seqTrack = new Seq();
 
-        int num = 0;
         boolean bArtists = false;
         boolean bArtist = false;
         boolean bArtistId = false;
@@ -115,7 +80,6 @@ public class ParserRelease {
         boolean bLabels = false;
         boolean bLabel = false;
 
-        private StringBuilder stringBuilder = null;
         private JDBC_Release jdbcRelease = new JDBC_Release();
 
         List<DC_Release> lRelease = new ArrayList<>();
@@ -126,23 +90,11 @@ public class ParserRelease {
         List<DC_ReleaseTrack> lReleaseTrack = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
-        public void startDocument() throws SAXException {
-            try {
-                if (!bTest) {
-                    JDBC_Response respTruncate = jdbcRelease.truncateAll(connection);
-                    if (!respTruncate.bSuccess) {
-                        throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
-                    }
-                    connection.commit();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
+        public void truncate() {
+            JDBC_Response respTruncate = jdbcRelease.truncateAll(connection);
+            if (!respTruncate.bSuccess) {
+                throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
             }
-        }
-        //----------------------------------------------------------------------------------
-        @Override
-        public void endDocument() throws SAXException {
-            if (!bTest) writeToDB();
         }
         //----------------------------------------------------------------------------------
         @Override
@@ -468,11 +420,7 @@ public class ParserRelease {
         }
         //----------------------------------------------------------------------------------
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            stringBuilder.append(new String(ch, start, length));
-        }
-        //----------------------------------------------------------------------------------
-        private void writeToDB() {
+        public void insert() {
             JDBC_Response respInsertRelease = jdbcRelease.insert(lRelease, connection);
             if (!respInsertRelease.bSuccess) {
                 throw new RuntimeException("Release msg:" + respInsertRelease.sMessage);
@@ -497,17 +445,21 @@ public class ParserRelease {
             if (!respInsertTrack.bSuccess) {
                 throw new RuntimeException("ReleaseTrack msg:" + respInsertTrack.sMessage);
             }
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+        }
+        //----------------------------------------------------------------------------------
+        @Override
+        public void clearLists() {
             lRelease = new ArrayList<>();
             lReleaseTrack = new ArrayList<>();
             lReleaseGenre = new ArrayList<>();
             lReleaseStyle = new ArrayList<>();
             lReleaseArtist = new ArrayList<>();
             lReleaseExtraArtist = new ArrayList<>();
+        }
+        //----------------------------------------------------------------------------------
+        @Override
+        public List<? extends DC_Entity> getResult() {
+            return lRelease;
         }
     }
 }

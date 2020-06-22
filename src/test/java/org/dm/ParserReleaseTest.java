@@ -399,7 +399,7 @@ public class ParserReleaseTest {
                 "</release>                                                                                                                " +
                 "";
         ParserRelease parserRelease = new ParserRelease();
-        List<DC_Release> lReleases = parserRelease.parser(sXML_release_01);
+        List<DC_Release> lReleases = (List<DC_Release>)parserRelease.parser(sXML_release_01);
         assertTrue(lReleases.get(0).lArtist.size() == 1);
         assertTrue(lReleases.get(0).lExtraArtist.size() == 4);
         assertTrue(lReleases.get(0).lStyle.size() == 3);
@@ -432,7 +432,8 @@ public class ParserReleaseTest {
                 assertTrue(!Core.isNull(track.sTitle));
             }
         }
-        lReleases = parserRelease.parser(sXML_release_02);
+
+        lReleases = (List<DC_Release>)parserRelease.parser(sXML_release_02);
         assertTrue(lReleases.get(0).lArtist.size() == 5);
         assertTrue(lReleases.get(0).lExtraArtist.size() == 0);
         assertTrue(lReleases.get(0).lStyle.size() == 1);
@@ -465,7 +466,8 @@ public class ParserReleaseTest {
                 assertTrue(!Core.isNull(track.sTitle));
             }
         }
-        lReleases = parserRelease.parser(sXML_release_03);
+
+        lReleases = (List<DC_Release>)parserRelease.parser(sXML_release_03);
         assertTrue(lReleases.get(0).lArtist.size() == 1);
         assertTrue(lReleases.get(0).lExtraArtist.size() == 5);
         assertTrue(lReleases.get(0).lStyle.size() == 2);

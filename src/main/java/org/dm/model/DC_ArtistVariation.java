@@ -1,7 +1,6 @@
 package org.dm.model;
 
-public class DC_ArtistVariation {
-    public Integer id;
+public class DC_ArtistVariation extends DC_Entity {
     public Integer idArtist;
     public Integer idArtistDC;
     public String sName;
@@ -12,7 +11,7 @@ public class DC_ArtistVariation {
     }
     //----------------------------------------------------------------------------------
     public void setsName(String sName) {
-        this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");;
+        this.sName = sName.replaceAll("[^\\u0000-\\uFFFF]", "\uFFFD");
     }
     //----------------------------------------------------------------------------------
     public void init() {

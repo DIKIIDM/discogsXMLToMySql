@@ -8,15 +8,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DC_Release {
-    public Integer id;
-    public Integer idDC;
+public class DC_Release extends DC_Entity {
     public Integer nYear;
     public String sTitle;
-    public Date dReleased;
     public String sReleased;
     public String sCountry;
-    public String sUri;
     public String sLabel;
     public List<DC_ReleaseArtist> lArtist;
     public List<DC_ReleaseArtist> lExtraArtist;

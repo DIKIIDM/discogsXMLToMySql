@@ -2,8 +2,7 @@ package org.dm.model;
 
 import org.dm.Core;
 
-public class DC_ReleaseArtist {
-    public Integer id;
+public class DC_ReleaseArtist extends DC_Entity {
     public Integer idArtistDC;
     public Integer idRelease;
     public Integer idReleaseDC;

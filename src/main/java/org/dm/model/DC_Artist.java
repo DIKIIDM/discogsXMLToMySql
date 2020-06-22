@@ -5,9 +5,7 @@ import org.dm.Core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DC_Artist {
-    public Integer id;
-    public Integer idDC;
+public class DC_Artist extends DC_Entity {
     public String sName;
     public String sRealName;
     public String sNameShort;

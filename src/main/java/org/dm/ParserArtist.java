@@ -6,53 +6,21 @@ import org.dm.model.*;
 import org.dm.repo.JDBC_Artist;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParserArtist {
+public class ParserArtist extends Parser {
     private static final Logger logger = LogManager.getLogger(ParserArtist.class);
     //----------------------------------------------------------------------------------
     public ParserArtist() {
     }
     //----------------------------------------------------------------------------------
-    public void parser(Connection connection, File file) {
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            XMLHandler handler = new XMLHandler();
-            handler.connection = connection;
-            parser.parse(file, handler);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public XMLHandler getHandler() {
+        return new XMLHandlerArtist();
     }
     //----------------------------------------------------------------------------------
-    public List<DC_Artist> parser(String sXML) {
-        List<DC_Artist> lArtist;
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            XMLHandler handler = new XMLHandler();
-            handler.bTest = true;
-            parser.parse(new ByteArrayInputStream(sXML.getBytes()), handler);
-            lArtist = handler.lArtist;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-        return lArtist;
-    }
-    //----------------------------------------------------------------------------------
-    private static class XMLHandler extends DefaultHandler {
-        Connection connection;
-        Boolean bTest = false;
+    public static class XMLHandlerArtist extends XMLHandler {
         DC_Artist artist;
         DC_ArtistAlias artistAlias;
         DC_ArtistVariation artistVariation;
@@ -61,7 +29,6 @@ public class ParserArtist {
         Seq seqArtistVariation = new Seq();
         Seq seqArtistAlias = new Seq();
 
-        int num = 0;
         boolean bId = false;
         boolean bName = false;
         boolean bRealName = false;
@@ -74,7 +41,6 @@ public class ParserArtist {
         boolean bGroups = false;
         boolean bNameGroup = false;
 
-        private StringBuilder stringBuilder = null;
         private JDBC_Artist jdbcArtist = new JDBC_Artist();
 
         List<DC_Artist> lArtist = new ArrayList<>();
@@ -82,23 +48,11 @@ public class ParserArtist {
         List<DC_ArtistAlias> lArtistAlias = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
-        public void startDocument() throws SAXException {
-            try {
-                if (!bTest) {
-                    JDBC_Response respTruncate = jdbcArtist.truncateAll(connection);
-                    if (!respTruncate.bSuccess) {
-                        throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
-                    }
-                    connection.commit();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
+        public void truncate() {
+            JDBC_Response respTruncate = jdbcArtist.truncateAll(connection);
+            if (!respTruncate.bSuccess) {
+                throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
             }
-        }
-        //----------------------------------------------------------------------------------
-        @Override
-        public void endDocument() throws SAXException {
-            if (!bTest) writeToDB();
         }
         //----------------------------------------------------------------------------------
         @Override
@@ -200,11 +154,7 @@ public class ParserArtist {
         }
         //----------------------------------------------------------------------------------
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            stringBuilder.append(new String(ch, start, length));
-        }
-        //----------------------------------------------------------------------------------
-        private void writeToDB() {
+        public void insert() {
             JDBC_Response respInsertArtist = jdbcArtist.insert(lArtist, connection);
             if (!respInsertArtist.bSuccess)
                 throw new RuntimeException("Artist msg:" + respInsertArtist.sMessage);
@@ -216,15 +166,18 @@ public class ParserArtist {
             JDBC_Response respInsertArtistAlias = jdbcArtist.insertAlias(lArtistAlias, connection);
             if (!respInsertArtistAlias.bSuccess)
                 throw new RuntimeException("ArtistAlias msg:" + respInsertArtistAlias.sMessage);
-
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+        }
+        //----------------------------------------------------------------------------------
+        @Override
+        public void clearLists() {
             lArtist = new ArrayList<>();
             lArtistVariation = new ArrayList<>();
             lArtistAlias = new ArrayList<>();
+        }
+        //----------------------------------------------------------------------------------
+        @Override
+        public List<? extends DC_Entity> getResult() {
+            return lArtist;
         }
     }
 }

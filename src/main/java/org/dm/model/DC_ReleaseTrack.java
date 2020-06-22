@@ -2,8 +2,7 @@ package org.dm.model;
 
 import org.dm.Core;
 
-public class DC_ReleaseTrack {
-    public Integer id;
+public class DC_ReleaseTrack extends DC_Entity {
     public Integer idRelease;
     public Integer idReleaseDC;
     public String sTitle;

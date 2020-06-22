@@ -210,8 +210,7 @@ public class ParserArtistTest {
                 "</artists>                                                                                                                                    " +
                 "";
         ParserArtist parserArtist = new ParserArtist();
-        List<DC_Artist> lArtist = parserArtist.parser(sXML_Artist);
-
+        List<DC_Artist> lArtist = (List<DC_Artist>)parserArtist.parser(sXML_Artist);
 
         assertTrue(lArtist.size() == 4);
         assertTrue(lArtist.get(0).lAlias.size() == 7 && lArtist.get(0).lVariation.size() == 2);
