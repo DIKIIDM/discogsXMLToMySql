@@ -3,12 +3,14 @@ package org.dm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dm.model.*;
+import org.dm.repo.JDBC_Genre;
 import org.dm.repo.JDBC_Release;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,8 @@ public class ParserRelease extends Parser {
     private static class XMLHandlerRelease extends XMLHandler {
         Map<Integer, Integer> idsLabel;
         Map<Integer, Integer> idsArtist;
+        Map<String, Integer> idsGenre = new HashMap<>();
+
         DC_Release release;
         DC_ReleaseArtist releaseArtist;
         DC_ReleaseArtist releaseExtraArtist;
@@ -54,9 +58,10 @@ public class ParserRelease extends Parser {
         Seq seqArtist = new Seq();
         Seq seqExtraArtist = new Seq();
         Seq seqStyle = new Seq();
-        Seq seqGenre = new Seq();
+        Seq seqReleaseGenre = new Seq();
         Seq seqTrack = new Seq();
         Seq seqLabel = new Seq();
+        Seq seqGenre = new Seq();
 
         boolean bArtists = false;
         boolean bArtist = false;
@@ -105,6 +110,7 @@ public class ParserRelease extends Parser {
         boolean bLabel = false;
 
         private JDBC_Release jdbcRelease = new JDBC_Release();
+        private JDBC_Genre jdbcGenre = new JDBC_Genre();
 
         List<DC_Release> lRelease = new ArrayList<>();
         List<DC_ReleaseArtist> lReleaseArtist = new ArrayList<>();
@@ -113,14 +119,17 @@ public class ParserRelease extends Parser {
         List<DC_ReleaseGenre> lReleaseGenre = new ArrayList<>();
         List<DC_ReleaseTrack> lReleaseTrack = new ArrayList<>();
         List<DC_ReleaseLabel> lReleaseLabel = new ArrayList<>();
+        List<DC_Genre> lGenre = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
         public void truncate() {
-            if (!bTest) {
-                JDBC_Response respTruncate = jdbcRelease.truncateAll(connection);
-                if (!respTruncate.bSuccess) {
-                    throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
-                }
+            JDBC_Response respTruncateRelease = jdbcRelease.truncateAll(connection);
+            if (!respTruncateRelease.bSuccess) {
+                throw new RuntimeException("truncate release msg:" + respTruncateRelease.sMessage);
+            }
+            JDBC_Response respTruncateGenre = jdbcGenre.truncateAll(connection);
+            if (!respTruncateGenre.bSuccess) {
+                throw new RuntimeException("truncate genre msg:" + respTruncateGenre.sMessage);
             }
         }
         //----------------------------------------------------------------------------------
@@ -242,7 +251,7 @@ public class ParserRelease extends Parser {
             } else if (qName.equalsIgnoreCase("Genre")) {
                 bGenre = true;
                 releaseGenre = new DC_ReleaseGenre();
-                releaseGenre.id = seqGenre.getNext();
+                releaseGenre.id = seqReleaseGenre.getNext();
                 releaseGenre.idRelease = release.id;
                 releaseGenre.idReleaseDC = release.idDC;
                 lReleaseGenre.add(releaseGenre);
@@ -283,7 +292,8 @@ public class ParserRelease extends Parser {
             } else if (bArtist && bArtistId) {
                 bArtistId = false;
                 releaseArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
-                releaseArtist.idArtist = idsArtist.get(releaseArtist.idArtistDC);
+                if (!bTest)
+                    releaseArtist.idArtist = idsArtist.get(releaseArtist.idArtistDC);
             } else if (bArtist && bArtistName) {
                 bArtistName = false;
                 releaseArtist.setsName(stringBuilder.toString());
@@ -304,7 +314,8 @@ public class ParserRelease extends Parser {
             } else if (bTrackArtist && bTrackArtistId) {
                 bTrackArtistId = false;
                 releaseTrackArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
-                releaseTrackArtist.idArtist = idsArtist.get(releaseTrackArtist.idArtistDC);
+                if (!bTest)
+                    releaseTrackArtist.idArtist = idsArtist.get(releaseTrackArtist.idArtistDC);
             } else if (bTrackArtist && bTrackArtistName) {
                 bTrackArtistName = false;
                 releaseTrackArtist.setsName(stringBuilder.toString());
@@ -329,7 +340,8 @@ public class ParserRelease extends Parser {
             } else if (bExtraArtist && bExtraArtistId) {
                 bExtraArtistId = false;
                 releaseExtraArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
-                releaseExtraArtist.idArtist = idsArtist.get(releaseExtraArtist.idArtistDC);
+                if (!bTest)
+                    releaseExtraArtist.idArtist = idsArtist.get(releaseExtraArtist.idArtistDC);
             } else if (bExtraArtist && bExtraArtistName) {
                 bExtraArtistName = false;
                 releaseExtraArtist.setsName(stringBuilder.toString());
@@ -350,7 +362,8 @@ public class ParserRelease extends Parser {
             } else if (bTrackExtraArtist && bTrackExtraArtistId) {
                 bTrackExtraArtistId = false;
                 releaseTrackExtraArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
-                releaseTrackExtraArtist.idArtist = idsArtist.get(releaseTrackExtraArtist.idArtistDC);
+                if (!bTest)
+                    releaseTrackExtraArtist.idArtist = idsArtist.get(releaseTrackExtraArtist.idArtistDC);
             } else if (bTrackExtraArtist && bTrackExtraArtistName) {
                 bTrackExtraArtistName = false;
                 releaseTrackExtraArtist.setsName(stringBuilder.toString());
@@ -384,7 +397,17 @@ public class ParserRelease extends Parser {
                 releaseStyle.setsName(stringBuilder.toString());
             } else if (bGenre) {
                 bGenre = false;
-                releaseGenre.setsName(stringBuilder.toString());
+                // releaseGenre.setsName(stringBuilder.toString());
+                if (!idsGenre.containsKey(stringBuilder.toString())) {
+                    DC_Genre genre = new DC_Genre();
+                    genre.id = seqGenre.getNext();
+                    genre.setsName(stringBuilder.toString());
+                    lGenre.add(genre);
+                    releaseGenre.idGenre = genre.id;
+                    idsGenre.put(stringBuilder.toString(), genre.id);
+                } else {
+                    releaseGenre.idGenre = idsGenre.get(stringBuilder.toString());
+                }
             } else if (bTracks && qName.equalsIgnoreCase("tracklist")) {
                 bTracks = false;
             } else if (bTracks && qName.equalsIgnoreCase("track")) {
@@ -463,13 +486,17 @@ public class ParserRelease extends Parser {
         //----------------------------------------------------------------------------------
         @Override
         public void insert() {
+            JDBC_Response respInsertGenre = jdbcGenre.insert(lGenre, connection);
+            if (!respInsertGenre.bSuccess) {
+                throw new RuntimeException("Genre msg:" + respInsertGenre.sMessage);
+            }
             JDBC_Response respInsertRelease = jdbcRelease.insert(lRelease, connection);
             if (!respInsertRelease.bSuccess) {
                 throw new RuntimeException("Release msg:" + respInsertRelease.sMessage);
             }
-            JDBC_Response respInsertGenre = jdbcRelease.insertReleaseGenre(lReleaseGenre, connection);
-            if (!respInsertGenre.bSuccess) {
-                throw new RuntimeException("ReleaseGenre msg:" + respInsertGenre.sMessage);
+            JDBC_Response respInsertReleaseGenre = jdbcRelease.insertReleaseGenre(lReleaseGenre, connection);
+            if (!respInsertReleaseGenre.bSuccess) {
+                throw new RuntimeException("ReleaseGenre msg:" + respInsertReleaseGenre.sMessage);
             }
             JDBC_Response respInsertStyle = jdbcRelease.insertReleaseStyle(lReleaseStyle, connection);
             if (!respInsertStyle.bSuccess) {
@@ -502,6 +529,7 @@ public class ParserRelease extends Parser {
             lReleaseArtist = new ArrayList<>();
             lReleaseExtraArtist = new ArrayList<>();
             lReleaseLabel = new ArrayList<>();
+            lGenre = new ArrayList<>();
         }
         //----------------------------------------------------------------------------------
         @Override

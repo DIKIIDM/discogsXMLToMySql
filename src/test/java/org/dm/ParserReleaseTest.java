@@ -430,7 +430,7 @@ public class ParserReleaseTest {
             for (DC_ReleaseGenre genre: release.lGenre) {
                 assertTrue(genre.idRelease.equals(release.id));
                 assertTrue(genre.idReleaseDC.equals(release.idDC));
-                assertTrue(!Core.isNull(genre.sName));
+                assertTrue(genre.idGenre != null);
             }
             for (DC_ReleaseStyle style: release.lStyle) {
                 assertTrue(style.idRelease.equals(release.id));

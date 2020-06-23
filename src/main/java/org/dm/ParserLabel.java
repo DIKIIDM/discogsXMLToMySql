@@ -50,7 +50,7 @@ public class ParserLabel extends Parser {
         public void truncate() {
             JDBC_Response respTruncate = jdbcLabel.truncateAll(connection);
             if (!respTruncate.bSuccess) {
-                throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
+                throw new RuntimeException("truncate label msg:" + respTruncate.sMessage);
             }
         }
         //----------------------------------------------------------------------------------

@@ -26,7 +26,7 @@ public class JDBC_Release {
             "   (   id                                  " +
             "      ,idRelease                           " +
             "      ,idReleaseDC                         " +
-            "      ,sName                               " +
+            "      ,idGenre                             " +
             "   )                                       " +
             " VALUES                                    " +
             "   (?, ?, ?, ?)                            ";
@@ -131,7 +131,8 @@ public class JDBC_Release {
                     if (releaseGenre.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, releaseGenre.id);
                     if (releaseGenre.idRelease == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseGenre.idRelease);
                     if (releaseGenre.idReleaseDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseGenre.idReleaseDC);
-                    if (Core.isNull(releaseGenre.sName)) ps.setNull(4, Types.VARCHAR); else ps.setString(4, releaseGenre.sName);
+                    if (releaseGenre.idGenre == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseGenre.idGenre);
+                   // if (Core.isNull(releaseGenre.sName)) ps.setNull(4, Types.VARCHAR); else ps.setString(4, releaseGenre.sName);
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -283,13 +284,15 @@ public class JDBC_Release {
         JDBC_Response response = new JDBC_Response();
         try {
             Statement statement = con.createStatement();
+            statement.executeUpdate("SET foreign_key_checks=0;");
+            statement.executeUpdate("TRUNCATE TABLE dc_releasegenre");
+            statement.executeUpdate("TRUNCATE TABLE dc_releasestyle");
+            statement.executeUpdate("TRUNCATE TABLE dc_releaseartist");
+            statement.executeUpdate("TRUNCATE TABLE dc_releaseextraartist");
+            statement.executeUpdate("TRUNCATE TABLE dc_releasetrack");
+            statement.executeUpdate("TRUNCATE TABLE dc_releaselabel");
             statement.executeUpdate("TRUNCATE TABLE dc_release");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseArtist");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseExtraArtist");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseGenre");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseStyle");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseTrack");
-            statement.executeUpdate("TRUNCATE TABLE dc_releaseLabel");
+            statement.executeUpdate("SET foreign_key_checks=1;");
             response.bSuccess = true;
         } catch (Exception e) {
             response.bSuccess = false;

@@ -62,7 +62,7 @@ public class ParserArtist extends Parser {
         public void truncate() {
             JDBC_Response respTruncate = jdbcArtist.truncateAll(connection);
             if (!respTruncate.bSuccess) {
-                throw new RuntimeException("truncateAll msg:" + respTruncate.sMessage);
+                throw new RuntimeException("truncate artist msg:" + respTruncate.sMessage);
             }
         }
         //----------------------------------------------------------------------------------
