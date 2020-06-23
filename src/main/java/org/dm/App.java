@@ -4,10 +4,16 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dm.model.JDBC_Response;
+import org.dm.repo.JDBC_Artist;
+import org.dm.repo.JDBC_Genre;
+import org.dm.repo.JDBC_Label;
+import org.dm.repo.JDBC_Release;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,6 +95,8 @@ public class App {
         try {
             con = DBManage.getDBConnect(databaseUsername, databaseUserPassword, databaseURL);
             con.setAutoCommit(false);
+            truncateAll(con);
+            con.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -118,6 +126,25 @@ public class App {
             con.close();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+    //----------------------------------------------------------------------------------
+    public static void truncateAll(Connection con) {
+        JDBC_Response respTruncateRelease = new JDBC_Release().truncateAll(con);
+        if (!respTruncateRelease.bSuccess) {
+            throw new RuntimeException("truncate release msg:" + respTruncateRelease.sMessage);
+        }
+        JDBC_Response respTruncateLabel = new JDBC_Label().truncateAll(con);
+        if (!respTruncateLabel.bSuccess) {
+            throw new RuntimeException("truncate label msg:" + respTruncateLabel.sMessage);
+        }
+        JDBC_Response respTruncateArtist = new JDBC_Artist().truncateAll(con);
+        if (!respTruncateArtist.bSuccess) {
+            throw new RuntimeException("truncate artist msg:" + respTruncateArtist.sMessage);
+        }
+        JDBC_Response respTruncateGenre = new JDBC_Genre().truncateAll(con);
+        if (!respTruncateGenre.bSuccess) {
+            throw new RuntimeException("truncate genre msg:" + respTruncateGenre.sMessage);
         }
     }
 }

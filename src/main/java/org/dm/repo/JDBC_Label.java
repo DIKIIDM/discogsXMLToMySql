@@ -44,7 +44,9 @@ public class JDBC_Label {
         JDBC_Response response = new JDBC_Response();
         try {
             Statement statement = con.createStatement();
+            statement.executeUpdate("SET foreign_key_checks=0;");
             statement.executeUpdate("TRUNCATE TABLE dc_label");
+            statement.executeUpdate("SET foreign_key_checks=1;");
             response.bSuccess = true;
         } catch (Exception e) {
             response.bSuccess = false;
