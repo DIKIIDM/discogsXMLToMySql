@@ -68,6 +68,20 @@ CREATE TABLE `dc_artistvariation` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dc_genre`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dc_genre` (
+  `id` int NOT NULL,
+  `sName` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `dc_genre_id_uindex` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `dc_label`
 --
 
@@ -165,11 +179,15 @@ CREATE TABLE `dc_releasegenre` (
   `id` int NOT NULL,
   `idRelease` int DEFAULT NULL,
   `idReleaseDC` int DEFAULT NULL,
+  `idGenre` int DEFAULT NULL,
   `sName` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `dc_releaseGenre_id_uindex` (`id`),
   KEY `dc_releasegenre_idRelease_index` (`idRelease`),
-  KEY `dc_releasegenre_idReleaseDC_index` (`idReleaseDC`)
+  KEY `dc_releasegenre_idReleaseDC_index` (`idReleaseDC`),
+  KEY `dc_releasegenre_dc_genre_id_fk` (`idGenre`),
+  CONSTRAINT `dc_releasegenre_dc_genre_id_fk` FOREIGN KEY (`idGenre`) REFERENCES `dc_genre` (`id`),
+  CONSTRAINT `dc_releasegenre_dc_release_id_fk` FOREIGN KEY (`idRelease`) REFERENCES `dc_release` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -242,4 +260,4 @@ CREATE TABLE `dc_releasetrack` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-06-23  8:42:31
+-- Dump completed on 2020-06-23 14:38:46
