@@ -109,6 +109,7 @@ CREATE TABLE `dc_release` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dc_releaseartist` (
   `id` int NOT NULL,
+  `idArtist` int DEFAULT NULL,
   `idArtistDC` int DEFAULT NULL,
   `idRelease` int DEFAULT NULL,
   `idReleaseDC` int DEFAULT NULL,
@@ -135,6 +136,7 @@ CREATE TABLE `dc_releaseartist` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dc_releaseextraartist` (
   `id` int NOT NULL,
+  `idArtist` int DEFAULT NULL,
   `idArtistDC` int DEFAULT NULL,
   `idRelease` int DEFAULT NULL,
   `idReleaseDC` int DEFAULT NULL,
@@ -240,4 +242,4 @@ CREATE TABLE `dc_releasetrack` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-06-22 20:34:41
+-- Dump completed on 2020-06-23  8:42:31

@@ -4,6 +4,7 @@ import org.dm.Core;
 
 public class DC_ReleaseArtist extends DC_Entity {
     public Integer idArtistDC;
+    public Integer idArtist;
     public Integer idRelease;
     public Integer idReleaseDC;
     public Integer idTrack;

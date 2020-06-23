@@ -42,6 +42,7 @@ public class JDBC_Release {
     private static String SQL_INSERT_ReleaseArtist = "  " +
             "INSERT INTO dc_releaseArtist               " +
             "   (   id                                  " +
+            "      ,idArtist                            " +
             "      ,idArtistDC                          " +
             "      ,idRelease                           " +
             "      ,idReleaseDC                         " +
@@ -53,10 +54,11 @@ public class JDBC_Release {
             "      ,sTracks                             " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)          ";
+            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)       ";
     private static String SQL_INSERT_ReleaseExtraArtist = "  " +
             "INSERT INTO dc_releaseExtraArtist          " +
             "   (   id                                  " +
+            "      ,idArtist                            " +
             "      ,idArtistDC                          " +
             "      ,idRelease                           " +
             "      ,idReleaseDC                         " +
@@ -68,7 +70,7 @@ public class JDBC_Release {
             "      ,sTracks                             " +
             "   )                                       " +
             " VALUES                                    " +
-            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)          ";
+            "   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)       ";
     private static String SQL_INSERT_ReleaseTrack = "   " +
             "INSERT INTO dc_releaseTrack                " +
             "   (   id                                  " +
@@ -119,7 +121,7 @@ public class JDBC_Release {
         return response;
     }
     //----------------------------------------------------------------------------------
-    public JDBC_Response insertReleseGenre(List<DC_ReleaseGenre> lReleaseGenre, Connection con) {
+    public JDBC_Response insertReleaseGenre(List<DC_ReleaseGenre> lReleaseGenre, Connection con) {
         JDBC_Response response = new JDBC_Response();
         int idvReturnedId = 0;
         try {
@@ -173,15 +175,17 @@ public class JDBC_Release {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT_ReleaseArtist, Statement.RETURN_GENERATED_KEYS);
                 for (DC_ReleaseArtist releaseArtist : lReleaseArtist) {
                     if (releaseArtist.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, releaseArtist.id);
-                    if (releaseArtist.idArtistDC == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseArtist.idArtistDC);
-                    if (releaseArtist.idRelease == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseArtist.idRelease);
-                    if (releaseArtist.idReleaseDC == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseArtist.idReleaseDC);
-                    if (releaseArtist.idTrack == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, releaseArtist.idTrack);
-                    if (Core.isNull(releaseArtist.sName)) ps.setNull(6, Types.VARCHAR); else ps.setString(6, releaseArtist.sName);
-                    if (Core.isNull(releaseArtist.sAnv)) ps.setNull(7, Types.VARCHAR); else ps.setString(7, releaseArtist.sAnv);
-                    if (Core.isNull(releaseArtist.sJoin)) ps.setNull(8, Types.VARCHAR); else ps.setString(8, releaseArtist.sJoin);
-                    if (Core.isNull(releaseArtist.sRole)) ps.setNull(9, Types.VARCHAR); else ps.setString(9, releaseArtist.sRole);
-                    if (Core.isNull(releaseArtist.sTracks)) ps.setNull(10, Types.VARCHAR); else ps.setString(10, releaseArtist.sTracks);
+                    if (releaseArtist.idArtist == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseArtist.idArtist);
+                    if (releaseArtist.idArtistDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseArtist.idArtistDC);
+                    if (releaseArtist.idRelease == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseArtist.idRelease);
+                    if (releaseArtist.idReleaseDC == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, releaseArtist.idReleaseDC);
+                    if (releaseArtist.idTrack == null) ps.setNull(6, Types.INTEGER); else ps.setInt(6, releaseArtist.idTrack);
+                    //if (Core.isNull(releaseArtist.sName)) ps.setNull(7, Types.VARCHAR); else ps.setString(7, releaseArtist.sName);
+                    ps.setNull(7, Types.VARCHAR); //data normalization
+                    if (Core.isNull(releaseArtist.sAnv)) ps.setNull(8, Types.VARCHAR); else ps.setString(8, releaseArtist.sAnv);
+                    if (Core.isNull(releaseArtist.sJoin)) ps.setNull(9, Types.VARCHAR); else ps.setString(9, releaseArtist.sJoin);
+                    if (Core.isNull(releaseArtist.sRole)) ps.setNull(10, Types.VARCHAR); else ps.setString(10, releaseArtist.sRole);
+                    if (Core.isNull(releaseArtist.sTracks)) ps.setNull(11, Types.VARCHAR); else ps.setString(11, releaseArtist.sTracks);
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -202,15 +206,17 @@ public class JDBC_Release {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT_ReleaseExtraArtist, Statement.RETURN_GENERATED_KEYS);
                 for (DC_ReleaseArtist releaseExtraArtist : lReleaseExtraArtist) {
                     if (releaseExtraArtist.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, releaseExtraArtist.id);
-                    if (releaseExtraArtist.idArtistDC == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseExtraArtist.idArtistDC);
-                    if (releaseExtraArtist.idRelease == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseExtraArtist.idRelease);
-                    if (releaseExtraArtist.idReleaseDC == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseExtraArtist.idReleaseDC);
-                    if (releaseExtraArtist.idTrack == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, releaseExtraArtist.idTrack);
-                    if (Core.isNull(releaseExtraArtist.sName)) ps.setNull(6, Types.VARCHAR); else ps.setString(6, releaseExtraArtist.sName);
-                    if (Core.isNull(releaseExtraArtist.sAnv)) ps.setNull(7, Types.VARCHAR); else ps.setString(7, releaseExtraArtist.sAnv);
-                    if (Core.isNull(releaseExtraArtist.sJoin)) ps.setNull(8, Types.VARCHAR); else ps.setString(8, releaseExtraArtist.sJoin);
-                    if (Core.isNull(releaseExtraArtist.sRole)) ps.setNull(9, Types.VARCHAR); else ps.setString(9, releaseExtraArtist.sRole);
-                    if (Core.isNull(releaseExtraArtist.sTracks)) ps.setNull(10, Types.VARCHAR); else ps.setString(10, releaseExtraArtist.sTracks);
+                    if (releaseExtraArtist.idArtist == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseExtraArtist.idArtist);
+                    if (releaseExtraArtist.idArtistDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseExtraArtist.idArtistDC);
+                    if (releaseExtraArtist.idRelease == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseExtraArtist.idRelease);
+                    if (releaseExtraArtist.idReleaseDC == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, releaseExtraArtist.idReleaseDC);
+                    if (releaseExtraArtist.idTrack == null) ps.setNull(6, Types.INTEGER); else ps.setInt(6, releaseExtraArtist.idTrack);
+                   // if (Core.isNull(releaseExtraArtist.sName)) ps.setNull(7, Types.VARCHAR); else ps.setString(7, releaseExtraArtist.sName);
+                    ps.setNull(7, Types.VARCHAR); //data normalization
+                    if (Core.isNull(releaseExtraArtist.sAnv)) ps.setNull(8, Types.VARCHAR); else ps.setString(8, releaseExtraArtist.sAnv);
+                    if (Core.isNull(releaseExtraArtist.sJoin)) ps.setNull(9, Types.VARCHAR); else ps.setString(9, releaseExtraArtist.sJoin);
+                    if (Core.isNull(releaseExtraArtist.sRole)) ps.setNull(10, Types.VARCHAR); else ps.setString(10, releaseExtraArtist.sRole);
+                    if (Core.isNull(releaseExtraArtist.sTracks)) ps.setNull(11, Types.VARCHAR); else ps.setString(11, releaseExtraArtist.sTracks);
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -283,6 +289,7 @@ public class JDBC_Release {
             statement.executeUpdate("TRUNCATE TABLE dc_releaseGenre");
             statement.executeUpdate("TRUNCATE TABLE dc_releaseStyle");
             statement.executeUpdate("TRUNCATE TABLE dc_releaseTrack");
+            statement.executeUpdate("TRUNCATE TABLE dc_releaseLabel");
             response.bSuccess = true;
         } catch (Exception e) {
             response.bSuccess = false;

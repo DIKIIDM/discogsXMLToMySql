@@ -283,7 +283,7 @@ public class ParserRelease extends Parser {
             } else if (bArtist && bArtistId) {
                 bArtistId = false;
                 releaseArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
-
+                releaseArtist.idArtist = idsArtist.get(releaseArtist.idArtistDC);
             } else if (bArtist && bArtistName) {
                 bArtistName = false;
                 releaseArtist.setsName(stringBuilder.toString());
@@ -304,6 +304,7 @@ public class ParserRelease extends Parser {
             } else if (bTrackArtist && bTrackArtistId) {
                 bTrackArtistId = false;
                 releaseTrackArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
+                releaseTrackArtist.idArtist = idsArtist.get(releaseTrackArtist.idArtistDC);
             } else if (bTrackArtist && bTrackArtistName) {
                 bTrackArtistName = false;
                 releaseTrackArtist.setsName(stringBuilder.toString());
@@ -328,6 +329,7 @@ public class ParserRelease extends Parser {
             } else if (bExtraArtist && bExtraArtistId) {
                 bExtraArtistId = false;
                 releaseExtraArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
+                releaseExtraArtist.idArtist = idsArtist.get(releaseExtraArtist.idArtistDC);
             } else if (bExtraArtist && bExtraArtistName) {
                 bExtraArtistName = false;
                 releaseExtraArtist.setsName(stringBuilder.toString());
@@ -348,6 +350,7 @@ public class ParserRelease extends Parser {
             } else if (bTrackExtraArtist && bTrackExtraArtistId) {
                 bTrackExtraArtistId = false;
                 releaseTrackExtraArtist.idArtistDC = Integer.parseInt(stringBuilder.toString());
+                releaseTrackExtraArtist.idArtist = idsArtist.get(releaseTrackExtraArtist.idArtistDC);
             } else if (bTrackExtraArtist && bTrackExtraArtistName) {
                 bTrackExtraArtistName = false;
                 releaseTrackExtraArtist.setsName(stringBuilder.toString());
@@ -464,7 +467,7 @@ public class ParserRelease extends Parser {
             if (!respInsertRelease.bSuccess) {
                 throw new RuntimeException("Release msg:" + respInsertRelease.sMessage);
             }
-            JDBC_Response respInsertGenre = jdbcRelease.insertReleseGenre(lReleaseGenre, connection);
+            JDBC_Response respInsertGenre = jdbcRelease.insertReleaseGenre(lReleaseGenre, connection);
             if (!respInsertGenre.bSuccess) {
                 throw new RuntimeException("ReleaseGenre msg:" + respInsertGenre.sMessage);
             }
