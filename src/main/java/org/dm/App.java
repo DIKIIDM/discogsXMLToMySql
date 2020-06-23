@@ -147,5 +147,9 @@ public class App {
         if (!respTruncateStyle.bSuccess) {
             throw new RuntimeException("truncate style msg:" + respTruncateStyle.sMessage);
         }
+        JDBC_Response respTruncateFormat = new JDBC_Format().truncateAll(con);
+        if (!respTruncateFormat.bSuccess) {
+            throw new RuntimeException("truncate format msg:" + respTruncateFormat.sMessage);
+        }
     }
 }

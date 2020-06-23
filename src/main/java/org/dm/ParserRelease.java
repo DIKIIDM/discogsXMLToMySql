@@ -3,6 +3,7 @@ package org.dm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dm.model.*;
+import org.dm.repo.JDBC_Format;
 import org.dm.repo.JDBC_Genre;
 import org.dm.repo.JDBC_Release;
 import org.dm.repo.JDBC_Style;
@@ -45,6 +46,7 @@ public class ParserRelease extends Parser {
         Map<Integer, Integer> idsArtist;
         Map<String, Integer> idsGenre = new HashMap<>();
         Map<String, Integer> idsStyle = new HashMap<>();
+        Map<String, Integer> idsFormat = new HashMap<>();
 
         DC_Release release;
         DC_ReleaseArtist releaseArtist;
@@ -65,6 +67,8 @@ public class ParserRelease extends Parser {
         Seq seqLabel = new Seq();
         Seq seqGenre = new Seq();
         Seq seqStyle = new Seq();
+        Seq seqFormat = new Seq();
+        Seq seqReleaseFormat = new Seq();
 
         boolean bArtists = false;
         boolean bArtist = false;
@@ -111,10 +115,13 @@ public class ParserRelease extends Parser {
         boolean bGenre = false;
         boolean bLabels = false;
         boolean bLabel = false;
+        boolean bFormats = false;
+        boolean bFormat = false;
 
         private JDBC_Release jdbcRelease = new JDBC_Release();
         private JDBC_Genre jdbcGenre = new JDBC_Genre();
         private JDBC_Style jdbcStyle = new JDBC_Style();
+        private JDBC_Format jdbcFormat = new JDBC_Format();
 
         List<DC_Release> lRelease = new ArrayList<>();
         List<DC_ReleaseArtist> lReleaseArtist = new ArrayList<>();
@@ -125,6 +132,8 @@ public class ParserRelease extends Parser {
         List<DC_ReleaseLabel> lReleaseLabel = new ArrayList<>();
         List<DC_Genre> lGenre = new ArrayList<>();
         List<DC_Style> lStyle = new ArrayList<>();
+        List<DC_Format> lFormat = new ArrayList<>();
+        List<DC_ReleaseFormat> lReleaseFormat = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
         public void truncate() {
@@ -135,6 +144,14 @@ public class ParserRelease extends Parser {
             JDBC_Response respTruncateGenre = jdbcGenre.truncateAll(connection);
             if (!respTruncateGenre.bSuccess) {
                 throw new RuntimeException("truncate genre msg:" + respTruncateGenre.sMessage);
+            }
+            JDBC_Response respTruncateStyle = jdbcStyle.truncateAll(connection);
+            if (!respTruncateStyle.bSuccess) {
+                throw new RuntimeException("truncate style msg:" + respTruncateStyle.sMessage);
+            }
+            JDBC_Response respTruncateFormat = jdbcFormat.truncateAll(connection);
+            if (!respTruncateFormat.bSuccess) {
+                throw new RuntimeException("truncate format msg:" + respTruncateFormat.sMessage);
             }
         }
         //----------------------------------------------------------------------------------
@@ -282,6 +299,29 @@ public class ParserRelease extends Parser {
                 lReleaseLabel.add(releaseLabel);
                 if (bTest)
                     release.lLabel.add(releaseLabel);
+            } else if (qName.equalsIgnoreCase("Formats")) {
+                bFormats = true;
+            } else if (qName.equalsIgnoreCase("Format") && bFormats) {
+                bFormat = true;
+                DC_ReleaseFormat releaseFormat = new DC_ReleaseFormat();
+                releaseFormat.id = seqReleaseFormat.getNext();
+                releaseFormat.idRelease = release.id;
+                releaseFormat.idReleaseDC = release.idDC;
+                releaseFormat.setsText(attributes.getValue("text"));
+                releaseFormat.nQty = Integer.valueOf(attributes.getValue("qty"));
+                String sName = attributes.getValue("name");
+                if (!idsFormat.containsKey(sName)) {
+                    DC_Format format = new DC_Format();
+                    format.id = seqFormat.getNext();
+                    format.setsName(sName);
+                    lFormat.add(format);
+                    idsFormat.put(sName, format.id);
+                    releaseFormat.idFormat = format.id;
+                } else {
+                    releaseFormat.idFormat = idsFormat.get(sName);
+                }
+                lReleaseFormat.add(releaseFormat);
+                if (bTest) release.lFormat.add(releaseFormat);
             }
             stringBuilder = new StringBuilder();
         }
@@ -440,6 +480,10 @@ public class ParserRelease extends Parser {
                 bLabels = false;
             }  if (bLabel && (qName.equalsIgnoreCase("label"))) {
                 bLabel = false;
+            }  if (bFormats && (qName.equalsIgnoreCase("formats"))) {
+                bFormats = false;
+            }  if (bFormat && (qName.equalsIgnoreCase("format"))) {
+                bFormat = false;
             }
             if (qName.equalsIgnoreCase("Release")) {
                 if ((bArtists)
@@ -487,6 +531,8 @@ public class ParserRelease extends Parser {
                         || (bGenre)
                         || (bLabels)
                         || (bLabel)
+                        || (bFormats)
+                        || (bFormat)
                         ) {
                     throw new RuntimeException("release parse error " + release.idDC);
                 }
@@ -508,6 +554,10 @@ public class ParserRelease extends Parser {
             JDBC_Response respInsertStyle = jdbcStyle.insert(lStyle, connection);
             if (!respInsertStyle.bSuccess) {
                 throw new RuntimeException("Style msg:" + respInsertStyle.sMessage);
+            }
+            JDBC_Response respInsertFormat = jdbcFormat.insert(lFormat, connection);
+            if (!respInsertFormat.bSuccess) {
+                throw new RuntimeException("Format msg:" + respInsertFormat.sMessage);
             }
             JDBC_Response respInsertRelease = jdbcRelease.insert(lRelease, connection);
             if (!respInsertRelease.bSuccess) {
@@ -537,6 +587,10 @@ public class ParserRelease extends Parser {
             if (!respInsertLabel.bSuccess) {
                 throw new RuntimeException("ReleaseLabel msg:" + respInsertLabel.sMessage);
             }
+            JDBC_Response respInsertReleaseFormat = jdbcRelease.insertReleaseFormat(lReleaseFormat, connection);
+            if (!respInsertReleaseFormat.bSuccess) {
+                throw new RuntimeException("ReleaseFormat msg:" + respInsertReleaseFormat.sMessage);
+            }
         }
         //----------------------------------------------------------------------------------
         @Override
@@ -550,6 +604,8 @@ public class ParserRelease extends Parser {
             lReleaseLabel = new ArrayList<>();
             lGenre = new ArrayList<>();
             lStyle = new ArrayList<>();
+            lFormat = new ArrayList<>();
+            lReleaseFormat = new ArrayList<>();
         }
         //----------------------------------------------------------------------------------
         @Override

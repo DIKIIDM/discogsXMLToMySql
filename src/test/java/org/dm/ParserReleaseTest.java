@@ -446,6 +446,11 @@ public class ParserReleaseTest {
                 assertTrue(label.idRelease.equals(release.id));
                 assertTrue(!Core.isNull(label.sCatno));
             }
+            for (DC_ReleaseFormat format: release.lFormat) {
+                assertTrue(format.idRelease.equals(release.id));
+                assertTrue(format.idReleaseDC.equals(release.idDC));
+                assertTrue(format.idFormat != null);
+            }
         }
     }
 }

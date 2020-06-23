@@ -94,6 +94,17 @@ public class JDBC_Release {
             "   )                                       " +
             " VALUES                                    " +
             "   (?, ?, ?, ?, ?, ?)                      ";
+    private static String SQL_INSERT_ReleaseFormat = "  " +
+            "INSERT INTO dc_releaseFormat               " +
+            "   (   id                                  " +
+            "      ,idRelease                           " +
+            "      ,idReleaseDC                         " +
+            "      ,idFormat                            " +
+            "      ,nQty                                " +
+            "      ,sText                               " +
+            "   )                                       " +
+            " VALUES                                    " +
+            "   (?, ?, ?, ?, ?, ?)                      ";
     //----------------------------------------------------------------------------------
     public JDBC_Response insert(List<DC_Release> lRelease, Connection con) {
         JDBC_Response response = new JDBC_Response();
@@ -282,6 +293,30 @@ public class JDBC_Release {
         return response;
     }
     //----------------------------------------------------------------------------------
+    public JDBC_Response insertReleaseFormat(List<DC_ReleaseFormat> lReleaseFormat, Connection con) {
+        JDBC_Response response = new JDBC_Response();
+        try {
+            if (lReleaseFormat.size() > 0) {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT_ReleaseFormat, Statement.RETURN_GENERATED_KEYS);
+                for (DC_ReleaseFormat object : lReleaseFormat) {
+                    if (object.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, object.id);
+                    if (object.idRelease == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, object.idRelease);
+                    if (object.idReleaseDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, object.idReleaseDC);
+                    if (object.idFormat == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, object.idFormat);
+                    if (object.nQty == null) ps.setNull(5, Types.INTEGER); else ps.setInt(5, object.nQty);
+                    if (Core.isNull(object.sText)) ps.setNull(6, Types.VARCHAR); else ps.setString(6, object.sText);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+            response.bSuccess = true;
+        } catch (Exception e) {
+            response.bSuccess = false;
+            response.sMessage = e.getMessage();
+        }
+        return response;
+    }
+    //----------------------------------------------------------------------------------
     public JDBC_Response truncateAll(Connection con) {
         JDBC_Response response = new JDBC_Response();
         try {
@@ -289,6 +324,7 @@ public class JDBC_Release {
             statement.executeUpdate("SET foreign_key_checks=0;");
             statement.executeUpdate("TRUNCATE TABLE dc_releasegenre");
             statement.executeUpdate("TRUNCATE TABLE dc_releasestyle");
+            statement.executeUpdate("TRUNCATE TABLE dc_releaseformat");
             statement.executeUpdate("TRUNCATE TABLE dc_releaseartist");
             statement.executeUpdate("TRUNCATE TABLE dc_releaseextraartist");
             statement.executeUpdate("TRUNCATE TABLE dc_releasetrack");
