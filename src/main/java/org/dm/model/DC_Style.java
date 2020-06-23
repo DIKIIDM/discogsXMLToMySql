@@ -2,15 +2,8 @@ package org.dm.model;
 
 import org.dm.Core;
 
-public class DC_ReleaseStyle extends DC_Entity {
-    public Integer idRelease;
-    public Integer idReleaseDC;
-    public Integer idStyle;
+public class DC_Style extends DC_Entity {
     public String sName;
-    //----------------------------------------------------------------------------------
-    public DC_ReleaseStyle() {
-
-    }
     //----------------------------------------------------------------------------------
     public void setsName(String sValue) {
         if (sValue != null)
@@ -19,5 +12,3 @@ public class DC_ReleaseStyle extends DC_Entity {
             this.sName = null;
     }
 }
-
-

@@ -35,7 +35,7 @@ public class JDBC_Release {
             "   (   id                                  " +
             "      ,idRelease                           " +
             "      ,idReleaseDC                         " +
-            "      ,sName                               " +
+            "      ,idStyle                             " +
             "   )                                       " +
             " VALUES                                    " +
             "   (?, ?, ?, ?)                            ";
@@ -155,7 +155,9 @@ public class JDBC_Release {
                     if (releaseStyle.id == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, releaseStyle.id);
                     if (releaseStyle.idRelease == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, releaseStyle.idRelease);
                     if (releaseStyle.idReleaseDC == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, releaseStyle.idReleaseDC);
-                    if (Core.isNull(releaseStyle.sName)) ps.setNull(4, Types.VARCHAR); else ps.setString(4, releaseStyle.sName);
+                    if (releaseStyle.idStyle == null) ps.setNull(4, Types.INTEGER); else ps.setInt(4, releaseStyle.idStyle);
+                    //if (Core.isNull(releaseStyle.sName)) ps.setNull(4, Types.VARCHAR); else ps.setString(4, releaseStyle.sName);
+
                     ps.addBatch();
                 }
                 ps.executeBatch();

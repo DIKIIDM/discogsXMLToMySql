@@ -435,7 +435,7 @@ public class ParserReleaseTest {
             for (DC_ReleaseStyle style: release.lStyle) {
                 assertTrue(style.idRelease.equals(release.id));
                 assertTrue(style.idReleaseDC.equals(release.idDC));
-                assertTrue(!Core.isNull(style.sName));
+                assertTrue(style.idStyle != null);
             }
             for (DC_ReleaseTrack track: release.lTrack) {
                 assertTrue(track.idRelease.equals(release.id));

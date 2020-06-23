@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.dm.model.*;
 import org.dm.repo.JDBC_Genre;
 import org.dm.repo.JDBC_Release;
+import org.dm.repo.JDBC_Style;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -43,6 +44,7 @@ public class ParserRelease extends Parser {
         Map<Integer, Integer> idsLabel;
         Map<Integer, Integer> idsArtist;
         Map<String, Integer> idsGenre = new HashMap<>();
+        Map<String, Integer> idsStyle = new HashMap<>();
 
         DC_Release release;
         DC_ReleaseArtist releaseArtist;
@@ -57,11 +59,12 @@ public class ParserRelease extends Parser {
         Seq seqRelease = new Seq();
         Seq seqArtist = new Seq();
         Seq seqExtraArtist = new Seq();
-        Seq seqStyle = new Seq();
+        Seq seqReleaseStyle = new Seq();
         Seq seqReleaseGenre = new Seq();
         Seq seqTrack = new Seq();
         Seq seqLabel = new Seq();
         Seq seqGenre = new Seq();
+        Seq seqStyle = new Seq();
 
         boolean bArtists = false;
         boolean bArtist = false;
@@ -111,6 +114,7 @@ public class ParserRelease extends Parser {
 
         private JDBC_Release jdbcRelease = new JDBC_Release();
         private JDBC_Genre jdbcGenre = new JDBC_Genre();
+        private JDBC_Style jdbcStyle = new JDBC_Style();
 
         List<DC_Release> lRelease = new ArrayList<>();
         List<DC_ReleaseArtist> lReleaseArtist = new ArrayList<>();
@@ -120,6 +124,7 @@ public class ParserRelease extends Parser {
         List<DC_ReleaseTrack> lReleaseTrack = new ArrayList<>();
         List<DC_ReleaseLabel> lReleaseLabel = new ArrayList<>();
         List<DC_Genre> lGenre = new ArrayList<>();
+        List<DC_Style> lStyle = new ArrayList<>();
         //----------------------------------------------------------------------------------
         @Override
         public void truncate() {
@@ -243,7 +248,7 @@ public class ParserRelease extends Parser {
             } else if (qName.equalsIgnoreCase("Style")) {
                 bStyle = true;
                 releaseStyle = new DC_ReleaseStyle();
-                releaseStyle.id = seqStyle.getNext();
+                releaseStyle.id = seqReleaseStyle.getNext();
                 releaseStyle.idRelease = release.id;
                 releaseStyle.idReleaseDC = release.idDC;
                 lReleaseStyle.add(releaseStyle);
@@ -394,7 +399,17 @@ public class ParserRelease extends Parser {
                 release.setsReleased(stringBuilder.toString());
             } else if (bStyle) {
                 bStyle = false;
-                releaseStyle.setsName(stringBuilder.toString());
+                //releaseStyle.setsName(stringBuilder.toString());
+                if (!idsStyle.containsKey(stringBuilder.toString())) {
+                    DC_Style style = new DC_Style();
+                    style.id = seqStyle.getNext();
+                    style.setsName(stringBuilder.toString());
+                    lStyle.add(style);
+                    releaseStyle.idStyle = style.id;
+                    idsStyle.put(stringBuilder.toString(), style.id);
+                } else {
+                    releaseStyle.idStyle = idsStyle.get(stringBuilder.toString());
+                }
             } else if (bGenre) {
                 bGenre = false;
                 // releaseGenre.setsName(stringBuilder.toString());
@@ -490,6 +505,10 @@ public class ParserRelease extends Parser {
             if (!respInsertGenre.bSuccess) {
                 throw new RuntimeException("Genre msg:" + respInsertGenre.sMessage);
             }
+            JDBC_Response respInsertStyle = jdbcStyle.insert(lStyle, connection);
+            if (!respInsertStyle.bSuccess) {
+                throw new RuntimeException("Style msg:" + respInsertStyle.sMessage);
+            }
             JDBC_Response respInsertRelease = jdbcRelease.insert(lRelease, connection);
             if (!respInsertRelease.bSuccess) {
                 throw new RuntimeException("Release msg:" + respInsertRelease.sMessage);
@@ -498,9 +517,9 @@ public class ParserRelease extends Parser {
             if (!respInsertReleaseGenre.bSuccess) {
                 throw new RuntimeException("ReleaseGenre msg:" + respInsertReleaseGenre.sMessage);
             }
-            JDBC_Response respInsertStyle = jdbcRelease.insertReleaseStyle(lReleaseStyle, connection);
-            if (!respInsertStyle.bSuccess) {
-                throw new RuntimeException("ReleaseStyle msg:" + respInsertStyle.sMessage);
+            JDBC_Response respInsertReleaseStyle = jdbcRelease.insertReleaseStyle(lReleaseStyle, connection);
+            if (!respInsertReleaseStyle.bSuccess) {
+                throw new RuntimeException("ReleaseStyle msg:" + respInsertReleaseStyle.sMessage);
             }
             JDBC_Response respInsertArtist = jdbcRelease.insertReleaseArtist(lReleaseArtist, connection);
             if (!respInsertArtist.bSuccess) {
@@ -530,6 +549,7 @@ public class ParserRelease extends Parser {
             lReleaseExtraArtist = new ArrayList<>();
             lReleaseLabel = new ArrayList<>();
             lGenre = new ArrayList<>();
+            lStyle = new ArrayList<>();
         }
         //----------------------------------------------------------------------------------
         @Override

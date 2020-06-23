@@ -5,10 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dm.model.JDBC_Response;
-import org.dm.repo.JDBC_Artist;
-import org.dm.repo.JDBC_Genre;
-import org.dm.repo.JDBC_Label;
-import org.dm.repo.JDBC_Release;
+import org.dm.repo.*;
 
 import java.io.File;
 import java.sql.Connection;
@@ -145,6 +142,10 @@ public class App {
         JDBC_Response respTruncateGenre = new JDBC_Genre().truncateAll(con);
         if (!respTruncateGenre.bSuccess) {
             throw new RuntimeException("truncate genre msg:" + respTruncateGenre.sMessage);
+        }
+        JDBC_Response respTruncateStyle = new JDBC_Style().truncateAll(con);
+        if (!respTruncateStyle.bSuccess) {
+            throw new RuntimeException("truncate style msg:" + respTruncateStyle.sMessage);
         }
     }
 }
