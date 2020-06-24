@@ -571,6 +571,10 @@ public class ParserRelease extends Parser {
             if (!respInsertReleaseStyle.bSuccess) {
                 throw new RuntimeException("ReleaseStyle msg:" + respInsertReleaseStyle.sMessage);
             }
+            JDBC_Response respInsertTrack = jdbcRelease.insertReleaseTrack(lReleaseTrack, connection);
+            if (!respInsertTrack.bSuccess) {
+                throw new RuntimeException("ReleaseTrack msg:" + respInsertTrack.sMessage);
+            }
             JDBC_Response respInsertArtist = jdbcRelease.insertReleaseArtist(lReleaseArtist, connection);
             if (!respInsertArtist.bSuccess) {
                 throw new RuntimeException("ReleaseArtist msg:" + respInsertArtist.sMessage);
@@ -578,10 +582,6 @@ public class ParserRelease extends Parser {
             JDBC_Response respInsertExtraArtist = jdbcRelease.insertReleaseExtraArtist(lReleaseExtraArtist, connection);
             if (!respInsertExtraArtist.bSuccess) {
                 throw new RuntimeException("ReleaseExtraArtist msg:" + respInsertExtraArtist.sMessage);
-            }
-            JDBC_Response respInsertTrack = jdbcRelease.insertReleaseTrack(lReleaseTrack, connection);
-            if (!respInsertTrack.bSuccess) {
-                throw new RuntimeException("ReleaseTrack msg:" + respInsertTrack.sMessage);
             }
             JDBC_Response respInsertLabel = jdbcRelease.insertReleaseLabel(lReleaseLabel, connection);
             if (!respInsertLabel.bSuccess) {
